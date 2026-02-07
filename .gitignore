@@ -1,0 +1,22 @@
+# Data & index artifacts (large, regenerable)
+raw/
+data/
+index/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env

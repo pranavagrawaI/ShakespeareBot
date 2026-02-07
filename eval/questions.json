@@ -1,0 +1,142 @@
+[
+  {
+    "id": "q01",
+    "type": "quote_lookup",
+    "question": "Where does 'to be or not to be' appear?",
+    "must_include": ["to be", "not to be"],
+    "expected_play": "Hamlet"
+  },
+  {
+    "id": "q02",
+    "type": "quote_lookup",
+    "question": "Which play contains 'Friends, Romans, countrymen, lend me your ears'?",
+    "must_include": ["friends", "romans", "countrymen"],
+    "expected_play": "Julius Caesar"
+  },
+  {
+    "id": "q03",
+    "type": "quote_lookup",
+    "question": "Where is 'All that glitters is not gold' found?",
+    "must_include": ["glitters", "gold"],
+    "expected_play": "Merchant of Venice"
+  },
+  {
+    "id": "q04",
+    "type": "quote_lookup",
+    "question": "In which play does someone say 'Double, double toil and trouble'?",
+    "must_include": ["double", "toil", "trouble"],
+    "expected_play": "Macbeth"
+  },
+  {
+    "id": "q05",
+    "type": "quote_lookup",
+    "question": "Where can I find 'The lady doth protest too much'?",
+    "must_include": ["protest", "too much"],
+    "expected_play": "Hamlet"
+  },
+  {
+    "id": "q06",
+    "type": "attribution",
+    "question": "Who says 'Et tu, Brute?' and in what play?",
+    "must_include": ["Caesar", "Julius Caesar"],
+    "expected_play": "Julius Caesar"
+  },
+  {
+    "id": "q07",
+    "type": "attribution",
+    "question": "Who delivers the 'To be or not to be' soliloquy?",
+    "must_include": ["Hamlet"],
+    "expected_play": "Hamlet"
+  },
+  {
+    "id": "q08",
+    "type": "attribution",
+    "question": "Who says 'Out, damned spot' in Macbeth?",
+    "must_include": ["Lady Macbeth"],
+    "expected_play": "Macbeth"
+  },
+  {
+    "id": "q09",
+    "type": "attribution",
+    "question": "Who speaks the 'All the world's a stage' speech?",
+    "must_include": ["Jaques"],
+    "expected_play": "As You Like It"
+  },
+  {
+    "id": "q10",
+    "type": "attribution",
+    "question": "Who says 'If music be the food of love, play on'?",
+    "must_include": ["Orsino"],
+    "expected_play": "Twelfth Night"
+  },
+  {
+    "id": "q11",
+    "type": "theme",
+    "question": "What is Hamlet's attitude toward death in Act 3?",
+    "must_include": [],
+    "expected_play": "Hamlet"
+  },
+  {
+    "id": "q12",
+    "type": "theme",
+    "question": "How does Lady Macbeth manipulate Macbeth into committing murder?",
+    "must_include": [],
+    "expected_play": "Macbeth"
+  },
+  {
+    "id": "q13",
+    "type": "theme",
+    "question": "What role does jealousy play in Othello?",
+    "must_include": [],
+    "expected_play": "Othello"
+  },
+  {
+    "id": "q14",
+    "type": "theme",
+    "question": "How is the theme of disguise used in Twelfth Night?",
+    "must_include": [],
+    "expected_play": "Twelfth Night"
+  },
+  {
+    "id": "q15",
+    "type": "theme",
+    "question": "What does Prospero say about his magic in The Tempest?",
+    "must_include": [],
+    "expected_play": "Tempest"
+  },
+  {
+    "id": "q16",
+    "type": "disambiguation",
+    "question": "Both Romeo and Juliet and Hamlet feature scenes in graveyards. What happens in each?",
+    "must_include": [],
+    "expected_play": null
+  },
+  {
+    "id": "q17",
+    "type": "disambiguation",
+    "question": "The word 'nothing' appears prominently in both Much Ado about Nothing and King Lear. How is it used differently?",
+    "must_include": [],
+    "expected_play": null
+  },
+  {
+    "id": "q18",
+    "type": "quote_lookup",
+    "question": "Where does 'Now is the winter of our discontent' appear?",
+    "must_include": ["winter", "discontent"],
+    "expected_play": "Richard III"
+  },
+  {
+    "id": "q19",
+    "type": "unanswerable",
+    "question": "What does Shakespeare think about artificial intelligence?",
+    "must_include": ["not found"],
+    "expected_play": null
+  },
+  {
+    "id": "q20",
+    "type": "unanswerable",
+    "question": "What is Shakespeare's opinion on climate change?",
+    "must_include": ["not found"],
+    "expected_play": null
+  }
+]

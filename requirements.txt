@@ -1,0 +1,7 @@
+requests
+beautifulsoup4
+rank-bm25
+sentence-transformers
+numpy
+openai
+python-dotenv
