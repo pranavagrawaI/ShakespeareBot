@@ -5,8 +5,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load .env file from project root (if it exists)
-load_dotenv(Path(__file__).resolve().parent / ".env")
+# Load .env file from project root (override any existing shell vars)
+load_dotenv(Path(__file__).resolve().parent / ".env", override=True)
 
 # ── Directories ──────────────────────────────────────────────
 ROOT_DIR = Path(__file__).resolve().parent
@@ -15,27 +15,30 @@ DATA_DIR = ROOT_DIR / "data"
 INDEX_DIR = ROOT_DIR / "index"
 EVAL_DIR = ROOT_DIR / "eval"
 
-# ── LLM (OpenRouter + DeepSeek) ─────────────────────────────
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-LLM_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+# ── LLM (OpenAI) ────────────────────────────────────────────
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+LLM_MODEL = "gpt-5-mini-2025-08-07"
 
 # ── Embeddings (local, no API key needed) ────────────────────
 EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 EMBED_DIM = 384
 
 # ── Retrieval defaults ───────────────────────────────────────
-BM25_K = 20  # BM25 candidate pool size
-EMBED_K = 20  # embedding candidate pool size
+BM25_K = 50  # BM25 candidate pool size
+EMBED_K = 50  # embedding candidate pool size
+RERANK_K = 30  # candidates sent to cross-encoder reranker
 TOP_K = 8  # final results returned
 BM25_WEIGHT = 0.4
 EMBED_WEIGHT = 0.6
 MAX_PER_SCENE = 3  # diversity cap: max chunks from same (play, act, scene)
 
+# ── Reranker (cross-encoder) ────────────────────────────────
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
 # ── Chunking defaults ────────────────────────────────────────
-CHUNK_MIN_LINES = 6
-CHUNK_MAX_LINES = 12
-CHUNK_OVERLAP = 2
+CHUNK_MIN_LINES = 15
+CHUNK_MAX_LINES = 30
+CHUNK_OVERLAP = 5
 
 # ── Scraping ─────────────────────────────────────────────────
 OSS_BASE = "https://www.opensourceshakespeare.org/views/plays"

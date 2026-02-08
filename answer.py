@@ -1,32 +1,39 @@
-"""LLM answer synthesis with citation enforcement via OpenRouter / DeepSeek."""
+"""LLM answer synthesis with citation enforcement via OpenAI."""
 
-import re
 import sys
 
 from openai import OpenAI
 
-from config import OPENROUTER_API_KEY, OPENROUTER_BASE_URL, LLM_MODEL
+from config import OPENAI_API_KEY, LLM_MODEL
+
+MAX_LLM_RETRIES = 3
+RETRY_BACKOFF = 2  # seconds; doubles each attempt
 
 
 # ── System prompt (behavioural contract) ────────────────────────
 
 SYSTEM_PROMPT = """\
-You are a Shakespeare scholar assistant. You answer questions using ONLY \
-the source passages provided below. Follow these rules strictly:
+You are a Shakespeare scholar assistant. Answer the user's question based \
+on the source passages provided below.
 
-1. CITATION DISCIPLINE: Every factual statement you make about the text \
-must include at least one inline citation like [S1], [S2], etc. referring \
-to the source passages listed below.
+RULES:
+1. CITE your evidence: every claim must include at least one inline \
+citation like [S1], [S2], etc. referring to the sources below.
 
-2. GROUNDING: If the provided sources do not contain enough evidence to \
-answer the question, you MUST say "This information was not found in the \
-provided text." Do NOT invent lines, speakers, scenes, or plot details.
+2. USE THE SOURCES: if a source contains text that is relevant to the \
+question — even partially — use it. You may draw reasonable inferences \
+from the text (e.g. identifying which character is speaking based on \
+context and stage directions). Combine evidence across multiple sources \
+when useful.
 
-3. QUOTING POLICY: Paraphrase by default. Only quote the original text \
-directly when the user explicitly asks for a quote or the exact wording.
+3. ONLY REFUSE when the sources contain genuinely NO relevant information. \
+Do not refuse simply because the evidence is indirect or requires \
+interpretation. Err on the side of answering.
 
-4. FORMAT: Write 2-10 clear sentences with inline citations. Do not use \
-any knowledge outside the sources provided.
+4. PARAPHRASE by default. Only quote directly when the user asks for \
+exact wording.
+
+5. FORMAT: Write 2-10 clear sentences with inline citations.
 """
 
 
@@ -67,15 +74,14 @@ def generate_answer(question: str, sources: list[dict]) -> str:
             "Sources:\n(none)"
         )
 
-    if not OPENROUTER_API_KEY:
+    if not OPENAI_API_KEY:
         print(
-            "ERROR: OPENROUTER_API_KEY environment variable not set.", file=sys.stderr
+            "ERROR: OPENAI_API_KEY environment variable not set.", file=sys.stderr
         )
         sys.exit(1)
 
     client = OpenAI(
-        api_key=OPENROUTER_API_KEY,
-        base_url=OPENROUTER_BASE_URL,
+        api_key=OPENAI_API_KEY,
         max_retries=5,
         timeout=120,
     )
@@ -90,23 +96,18 @@ def generate_answer(question: str, sources: list[dict]) -> str:
     response = client.chat.completions.create(
         model=LLM_MODEL,
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "developer", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_message},
         ],
-        temperature=0.3,
-        max_tokens=1024,
+        max_completion_tokens=1024,
     )
 
     if not response.choices:
         raise RuntimeError(f"LLM returned no choices. Response: {response}")
 
     message = response.choices[0].message
-    # R1 models may put the answer in `content` or return None with reasoning
     raw_text = message.content or ""
-    raw_text = raw_text.strip()
-
-    # Strip <think>...</think> reasoning blocks from R1 models
-    answer_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+    answer_text = raw_text.strip()
 
     if not answer_text:
         answer_text = "This information was not found in the provided text."

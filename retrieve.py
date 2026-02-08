@@ -1,16 +1,18 @@
-"""Hybrid BM25 + embedding retrieval with score fusion and diversity filtering."""
+"""Hybrid BM25 + embedding retrieval with cross-encoder reranking."""
 
 import json
 import sys
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 
 from config import (
     DATA_DIR,
     EMBED_MODEL,
+    RERANK_MODEL,
     BM25_K,
     EMBED_K,
+    RERANK_K,
     TOP_K,
     BM25_WEIGHT,
     EMBED_WEIGHT,
@@ -26,12 +28,13 @@ _corpus_tokens = None
 _embeddings = None
 _metas = None
 _embed_model = None
+_rerank_model = None
 _chunks = None
 
 
 def _ensure_loaded():
-    """Load index artifacts and embedding model on first use."""
-    global _bm25, _corpus_tokens, _embeddings, _metas, _embed_model, _chunks
+    """Load index artifacts, embedding model, and reranker on first use."""
+    global _bm25, _corpus_tokens, _embeddings, _metas, _embed_model, _rerank_model, _chunks
 
     if _bm25 is not None:
         return
@@ -49,6 +52,7 @@ def _ensure_loaded():
             _chunks.append(json.loads(line))
 
     _embed_model = SentenceTransformer(EMBED_MODEL)
+    _rerank_model = CrossEncoder(RERANK_MODEL)
 
 
 # ── Core retrieval ──────────────────────────────────────────────
@@ -122,6 +126,14 @@ def _phrase_boost(
         if needle in haystack:
             boosts[idx] = 1.0  # will be added on top of fused score
     return boosts
+
+
+def _rerank(query: str, indices: list[int], chunks: list[dict], k: int) -> list[int]:
+    """Score query-chunk pairs with a cross-encoder and return top-k indices."""
+    pairs = [(query, chunks[idx]["text"]) for idx in indices]
+    scores = _rerank_model.predict(pairs)
+    ranked = sorted(zip(indices, scores), key=lambda x: x[1], reverse=True)
+    return [idx for idx, _ in ranked[:k]]
 
 
 def _apply_diversity(ranked: list[dict], max_per_scene: int) -> list[dict]:
@@ -198,8 +210,9 @@ def retrieve(
             candidates.add(idx)
         fused[idx] = fused.get(idx, 0.0) + boost
 
-    # --- Sort and build source objects ---
-    ranked_indices = sorted(fused, key=fused.get, reverse=True)
+    # --- Rough rank, then rerank top candidates with cross-encoder ---
+    rough_ranked = sorted(fused, key=fused.get, reverse=True)[:RERANK_K]
+    ranked_indices = _rerank(query, rough_ranked, _chunks, len(rough_ranked))
 
     sources = []
     for idx in ranked_indices:
